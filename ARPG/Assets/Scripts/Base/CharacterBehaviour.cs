@@ -30,4 +30,8 @@ public abstract class CharacterBehaviour : MonoBehaviour {
 	protected virtual void Update () {
 		
 	}
+
+    protected virtual void InitializeSkillSet() {
+
+    }
 }

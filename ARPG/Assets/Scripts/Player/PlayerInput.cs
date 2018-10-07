@@ -21,12 +21,11 @@ public class PlayerInput : CharacterBehaviour {
     public float cameraDistance { get { return _cameraDistance; } }
     [SerializeField] private float scrollMultiplier = 1f;
 
-    public delegate void AttackAction();
-    public event AttackAction Attack;
-
-    public delegate void JumpAction();
-    public event JumpAction Jump;
-
+    // these events don't need to pass in any extra information. Other classes will store info and handle.
+    public delegate void CoreActionDelegate();
+    public event CoreActionDelegate AttackEvent;
+    public event CoreActionDelegate JumpEvent;
+    
     protected override void Awake() {
         Instance = this;
         base.Awake();
@@ -52,7 +51,11 @@ public class PlayerInput : CharacterBehaviour {
                 break;
         }
 	}
-    
+
+    protected override void InitializeSkillSet() {
+        base.InitializeSkillSet();
+    }
+
     private void MouseNKeyboardInput() {
         // directional movement input
         float horizontal = Input.GetAxis("Horizontal");
@@ -67,10 +70,10 @@ public class PlayerInput : CharacterBehaviour {
         _cameraDistance -= Input.GetAxis("Mouse ScrollWheel") * scrollMultiplier;
         _cameraDistance = Mathf.Clamp(_cameraDistance, 1f, 10f);
 
-        if (Input.GetButtonDown("Jump")) { Jump.Invoke(); }
-        if (Input.GetButtonDown("Attack")) { Attack.Invoke(); }
+        if (Input.GetButtonDown("Jump")) { JumpEvent.Invoke(); }
+        if (Input.GetButtonDown("Attack")) { AttackEvent.Invoke(); }
     }
-
+    
     private void ControllerInput() {
 
     }

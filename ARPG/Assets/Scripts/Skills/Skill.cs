@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,10 +9,20 @@ using UnityEngine;
 public abstract class Skill : ScriptableObject {
 
     [SerializeField] private AnimationClip _skillAnimation;
-    public AnimationClip skillAnimation { get { return _skillAnimation; } }
+    public virtual AnimationClip skillAnimation { get { return _skillAnimation; } }
 
     /// <summary>
     /// Receives a character behaviour to perform a skill
     /// </summary>
     public abstract void Use(CharacterBehaviour brain);
+
+    /// <summary>
+    /// Action that occurs at the start of the skill
+    /// </summary>
+    public abstract void OnSkillStart(CharacterBehaviour brain);
+
+    /// <summary>
+    /// Action that occurs at the end of the skill
+    /// </summary>
+    public abstract void OnSkillEnd(CharacterBehaviour brain);
 }

@@ -1385,6 +1385,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e1a972cbc7995b438812af3d40a0ced, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _performingAction: 0
   inputState: 0
   scrollMultiplier: 5
 --- !u!114 &1896056307
@@ -1452,6 +1453,7 @@ MonoBehaviour:
   clips:
   - {fileID: 7400000, guid: 13e348e66f49dee489fc9f2b5c980458, type: 2}
   - {fileID: 7400000, guid: ef8faa02db1d09a458bab9952c107ea4, type: 2}
+  clipIndex: 0
 --- !u!114 &1896056309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1464,11 +1466,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseSpeed: 5
+  anim: {fileID: 2065692371}
   body: {fileID: 1654170044}
   rightHandRoot: {fileID: 0}
   leftHandRoot: {fileID: 0}
   movementVelocity: {x: 0, y: 0, z: 0}
   jumpForce: 10
+  attackString:
+  - {fileID: 11400000, guid: fdad95afc70e9054fa98d18ddd7821ba, type: 2}
+  - {fileID: 11400000, guid: ebc993cf9b8add5478b8c4f7e1cf17c2, type: 2}
+  _attackStringIndex: 0
 --- !u!1 &1993825466 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 100002, guid: 7b1eb920b86025c42a3ba9fff1e3e6cd, type: 3}

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class EquipmentManager : MonoBehaviour {
+public class EquipmentManager : MonoBehaviour {
 
     // the anchors that hold the equipment
     [SerializeField] private Transform bodyCore;
