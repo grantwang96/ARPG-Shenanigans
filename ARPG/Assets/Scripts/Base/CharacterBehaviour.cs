@@ -7,7 +7,6 @@ using UnityEngine.AI;
 /// The brain of a given character
 /// This object should have access to all relevant components of the character in order to process and execute various actions
 /// </summary>
-[RequireComponent(typeof(Damageable))]
 public abstract class CharacterBehaviour : MonoBehaviour, Damageable {
 
     /// <summary>
@@ -37,17 +36,7 @@ public abstract class CharacterBehaviour : MonoBehaviour, Damageable {
         _currentBusyState = BusyState.NONE;
         _stats = GetComponent<CharacterStats>();
     }
-
-    // Use this for initialization
-    protected virtual void Start() {
-
-    }
-
-    // Update is called once per frame
-    protected virtual void Update() {
-
-    }
-
+    
     public virtual void TakeDamage(int damage) {
         Debug.Log(name + " has taken " + damage + " points of damage!");
     }

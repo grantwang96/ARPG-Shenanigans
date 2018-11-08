@@ -36,8 +36,7 @@ public class GameplayController : CharacterBehaviour {
     }
 
     // Use this for initialization
-    protected override void Start () {
-        base.Start();
+    protected void Start () {
 		if(inputState == InputState.KeyboardMouse) {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -45,7 +44,7 @@ public class GameplayController : CharacterBehaviour {
 	}
 	
 	// Update is called once per frame
-	protected override void Update () {
+	protected void Update () {
         switch (inputState) {
             case InputState.KeyboardMouse:
                 MouseNKeyboardInput();
