@@ -10,6 +10,12 @@ public abstract class Skill : ScriptableObject {
 
     [SerializeField] private AnimationClip _skillAnimation;
     public virtual AnimationClip skillAnimation { get { return _skillAnimation; } }
+    public virtual float Duration {
+        get {
+            float animationDuration = skillAnimation != null ? skillAnimation.length : 0f;
+            return animationDuration;
+        }
+    }
 
     /// <summary>
     /// Receives a character behaviour to perform a skill

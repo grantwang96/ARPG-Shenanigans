@@ -21,7 +21,7 @@ public class CameraController : MonoBehaviour {
     }
     [SerializeField] private TrackingMode trackingMode;
 
-    public AnimationHandler animHandler;
+    public CharacterAnimationHandler animHandler;
 
     // Use this for initialization
     void Start () {
@@ -39,8 +39,8 @@ public class CameraController : MonoBehaviour {
         // 1. get mouse input data
         // float mouseX = Input.GetAxis("Mouse X") * Time.deltaTime * mouseSensitivity; // horizontal mousespeed
         // float mouseY = Input.GetAxis("Mouse Y") * Time.deltaTime * mouseSensitivity; // vertical mousespeed
-        float mouseX = PlayerInput.Instance.cameraVector.x * Time.deltaTime * mouseSensitivity; // horizontal mousespeed
-        float mouseY = PlayerInput.Instance.cameraVector.y * Time.deltaTime * mouseSensitivity; // vertical mousespeed
+        float mouseX = GameplayController.Instance.cameraVector.x * Time.deltaTime * mouseSensitivity; // horizontal mousespeed
+        float mouseY = GameplayController.Instance.cameraVector.y * Time.deltaTime * mouseSensitivity; // vertical mousespeed
 
         animHandler.TiltCharacter(mouseX);
 
@@ -77,11 +77,11 @@ public class CameraController : MonoBehaviour {
 
     private void CameraDistanceCorrector() {
         cam.transform.localPosition =
-            Vector3.back * Mathf.Lerp(cam.transform.localPosition.magnitude, PlayerInput.Instance.cameraDistance, 0.3f);
+            Vector3.back * Mathf.Lerp(cam.transform.localPosition.magnitude, GameplayController.Instance.cameraDistance, 0.3f);
         if (!correctCameraDist) { return; }
         RaycastHit rayHit;
         if(Physics.Raycast(
-            new Ray(cameraPivot.position, -cameraPivot.forward), out rayHit, PlayerInput.Instance.cameraDistance, cameraCollide, QueryTriggerInteraction.Ignore))
+            new Ray(cameraPivot.position, -cameraPivot.forward), out rayHit, GameplayController.Instance.cameraDistance, cameraCollide, QueryTriggerInteraction.Ignore))
         {
             cam.transform.localPosition = Vector3.back * (rayHit.distance - collisionOffset);
         }

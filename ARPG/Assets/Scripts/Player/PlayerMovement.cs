@@ -3,16 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(GameplayController))]
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(CameraController))]
 public class PlayerMovement : CharacterMoveController { // this class handles the player's movement
-
-    private PlayerInput playerInput;
-    private CharacterController charCon;
+    
     private CameraController camCon;
-
-    [SerializeField] private Animator anim;
 
     [SerializeField] private Transform body;
     [SerializeField] private Transform rightHandRoot;
@@ -21,25 +17,26 @@ public class PlayerMovement : CharacterMoveController { // this class handles th
     [SerializeField] private Vector3 movementVelocity;
     [SerializeField] private float jumpForce; // the initial velocity of the player when jumping
 
-    [SerializeField] private List<Skill> attackString = new List<Skill>();
-    [SerializeField] private int _attackStringIndex = 0;
     [SerializeField] private float lastAttackTime = 0;
 
     // component initialization
     public override void Awake() {
-        playerInput = GetComponent<PlayerInput>();
-        charCon = GetComponent<CharacterController>();
+        base.Awake();
         camCon = GetComponent<CameraController>();
         movementVelocity.y = Physics.gravity.y;
     }
 
     // Use this for initialization
     public override void Start() {
-        _attackStringIndex = attackString.Count - 1;
+
     }
     
     private void OnEnable() {
         RegisterEventCallbacks();
+    }
+
+    private void OnDisable() {
+        DeregisterEventCallbacks();
     }
 
     /// <summary>
@@ -47,17 +44,17 @@ public class PlayerMovement : CharacterMoveController { // this class handles th
     /// </summary>
     private void RegisterEventCallbacks() {
         Debug.Log("Registering player callback functions");
-        PlayerInput.Instance.AttackEvent += OnAttack;
-        PlayerInput.Instance.JumpEvent += OnJump;
+        GameplayController.Instance.AttackEvent += OnAttack;
+        GameplayController.Instance.JumpEvent += OnJump;
     }
 
     /// <summary>
     /// Removes all callbacks for player actions
     /// </summary>
-    private void DeRegisterEventCallbacks() {
+    private void DeregisterEventCallbacks() {
         Debug.Log("Deregistering player callback functions");
-        PlayerInput.Instance.AttackEvent -= OnAttack;
-        PlayerInput.Instance.JumpEvent -= OnJump;
+        GameplayController.Instance.AttackEvent -= OnAttack;
+        GameplayController.Instance.JumpEvent -= OnJump;
     }
 
     private void FixedUpdate() {
@@ -66,7 +63,7 @@ public class PlayerMovement : CharacterMoveController { // this class handles th
         ProcessPlayerInput();
 
         // move character controller at the end of loop
-        charCon.Move(movementVelocity * Time.deltaTime);
+        characterController.Move(movementVelocity * Time.deltaTime);
     }
 
     /// <summary>
@@ -74,12 +71,17 @@ public class PlayerMovement : CharacterMoveController { // this class handles th
     /// </summary>
     /// <returns></returns>
     private void ProcessPlayerInput() { // this produces the raw velocity of the player
+        if (characterController.isGrounded) { movementVelocity = new Vector3(0f, movementVelocity.y, 0f); }
+        if(GameplayController.Instance.CurrentBusyState != CharacterBehaviour.BusyState.NONE) { return; }
         Vector3 movementClamped =
-            camCon.cameraAnchor.forward * playerInput.walkVector.z + camCon.cameraAnchor.right * playerInput.walkVector.x;
+            camCon.cameraAnchor.forward * characterBehaviour.walkVector.z + camCon.cameraAnchor.right * characterBehaviour.walkVector.x;
         movementVelocity = new Vector3(movementClamped.x * baseSpeed, movementVelocity.y, movementClamped.z * baseSpeed);
         body.forward = Vector3.Lerp(body.forward, movementClamped.normalized, 0.5f);
     }
 
+    /// <summary>
+    /// Calculates the character's vertical velocity
+    /// </summary>
     private void ProcessGravity() {
         if (movementVelocity.y > Physics.gravity.y) {
             movementVelocity.y += Time.deltaTime * Physics.gravity.y;
@@ -91,66 +93,19 @@ public class PlayerMovement : CharacterMoveController { // this class handles th
     /// </summary>
     private void OnAttack() {
 
-        if (performingAction) { return; }
-
-        int clipIndexOld = SelectAttack();
-        Skill currentSkill = attackString[_attackStringIndex];
-        float animationLength = 0f;
-        animationLength = currentSkill.skillAnimation.length;
-
-        OverrideAnimator("Attack", attackString[clipIndexOld].skillAnimation, attackString[_attackStringIndex].skillAnimation);
-
-        anim.Play("Attack");
-        lastAttackTime = Time.time;
-        StartCoroutine(processAction(animationLength, currentSkill));
     }
-
-    private int SelectAttack() {
-        int clipIndexOld = _attackStringIndex;
-        if(Time.time - lastAttackTime > 1f) {
-            _attackStringIndex = 0;
-        } else {
-            clipIndexOld = _attackStringIndex;
-            _attackStringIndex++;
-            if (_attackStringIndex >= attackString.Count) { _attackStringIndex = 0; }
-        }
-        return clipIndexOld;
-    }
-
-    private void OverrideAnimator(string stateName, AnimationClip toBeOverridden, AnimationClip newClip) {
-
-        AnimatorOverrideController aoc = new AnimatorOverrideController(anim.runtimeAnimatorController);
-        var animClips = new List<KeyValuePair<AnimationClip, AnimationClip>>();
-
-        foreach (AnimationClip a in aoc.animationClips) {
-            AnimationClip clip = a;
-            if (a == toBeOverridden) {
-                clip = newClip;
-            }
-            animClips.Add(new KeyValuePair<AnimationClip, AnimationClip>(a, clip));
-        }
-        aoc.ApplyOverrides(animClips);
-        anim.runtimeAnimatorController = aoc;
-    }
-
-    private IEnumerator processAction(float animationTime, Skill skill) {
-        Debug.Log("Animation Time" + animationTime);
-        skill.OnSkillStart(PlayerInput.Instance);
-        _performingAction = true;
-        yield return new WaitForSeconds(animationTime);
-        skill.OnSkillEnd(PlayerInput.Instance);
-        _performingAction = false;
-    }
-
+    
     /// <summary>
     /// Event callback that makes the playerobject jump
     /// </summary>
     private void OnJump() {
-        if (!charCon.isGrounded) { return; }
+        if (!characterController.isGrounded) { return; }
         movementVelocity.y = jumpForce;
     }
 
     private void OnControllerColliderHit(ControllerColliderHit hit) {
-        
+        if(hit.rigidbody != null) {
+            hit.rigidbody.AddForce(characterController.velocity);
+        }
     }
 }

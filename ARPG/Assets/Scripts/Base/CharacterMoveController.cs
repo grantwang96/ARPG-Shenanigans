@@ -10,8 +10,14 @@ public abstract class CharacterMoveController : MonoBehaviour { // Handles chara
     [SerializeField] protected bool _performingAction;
     public bool performingAction { get { return _performingAction; } }
 
-    public virtual void Awake() {
+    protected CharacterBehaviour characterBehaviour; // gain read access from character's brain
+    protected CharacterController characterController; // accesses the character controller on the character
 
+    protected Coroutine busyAnimation; // coroutine that prevents other actions from being taken
+
+    public virtual void Awake() {
+        characterBehaviour = GetComponent<CharacterBehaviour>();
+        characterController = GetComponent<CharacterController>();
     }
 
     public virtual void Start() {

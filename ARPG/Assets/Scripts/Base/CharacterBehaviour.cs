@@ -8,30 +8,83 @@ using UnityEngine.AI;
 /// This object should have access to all relevant components of the character in order to process and execute various actions
 /// </summary>
 [RequireComponent(typeof(Damageable))]
-public abstract class CharacterBehaviour : MonoBehaviour {
+public abstract class CharacterBehaviour : MonoBehaviour, Damageable {
 
-    protected Damageable myDamageable;
-    protected AnimationHandler animHandler;
+    /// <summary>
+    /// The "intended" vector that the character wants to move
+    /// </summary>
+    protected Vector3 _walkVector;
+    public Vector3 walkVector { get { return _walkVector; } }
+
+    public enum BusyState {
+        NONE, ATTACK, SKILL
+    }
+
+    [SerializeField] protected BusyState _currentBusyState;
+    public BusyState CurrentBusyState { get { return _currentBusyState; } }
+    protected Coroutine busyRoutine;
+
+    [SerializeField] protected int _attackComboIndex = 0;
+    public int AttackComboIndex { get { return _attackComboIndex; } }
+    [SerializeField] protected Skill[] attackCombo;
+    public Skill[] AttackCombo { get { return attackCombo; } }
+
+    protected CharacterAnimationHandler animHandler;
     protected CharacterStats _stats;
     public CharacterStats stats { get { return _stats; } }
 
     protected virtual void Awake() {
-        myDamageable = GetComponent<Damageable>();
-        animHandler = GetComponent<AnimationHandler>();
+        _currentBusyState = BusyState.NONE;
         _stats = GetComponent<CharacterStats>();
     }
 
-	// Use this for initialization
-	protected virtual void Start () {
-        
-	}
-	
-	// Update is called once per frame
-	protected virtual void Update () {
-		
-	}
+    // Use this for initialization
+    protected virtual void Start() {
+
+    }
+
+    // Update is called once per frame
+    protected virtual void Update() {
+
+    }
+
+    public virtual void TakeDamage(int damage) {
+        Debug.Log(name + " has taken " + damage + " points of damage!");
+    }
+
+    protected virtual void Die() {
+
+    }
 
     protected virtual void InitializeSkillSet() {
 
+    }
+
+    protected virtual void Attack() {
+
+    }
+
+    /// <summary>
+    /// Disables other actions until the skill has been completed
+    /// </summary>
+    /// <param name="skill"></param>
+    /// <returns></returns>
+    protected virtual IEnumerator processAction(Skill skill, BusyState busyState) {
+        skill.OnSkillStart(this);
+        _currentBusyState = busyState;
+        yield return new WaitForSeconds(skill.Duration);
+        skill.OnSkillEnd(this);
+        _currentBusyState = BusyState.NONE;
+    }
+
+    /// <summary>
+    /// Disables other actions until this processingAction has been completed
+    /// </summary>
+    /// <param name="duration"></param>
+    /// <returns></returns>
+    protected virtual IEnumerator processAction(BusyState busyState, float duration) {
+        _currentBusyState = busyState;
+        yield return new WaitForSeconds(duration);
+        _currentBusyState = BusyState.NONE;
     }
 }
