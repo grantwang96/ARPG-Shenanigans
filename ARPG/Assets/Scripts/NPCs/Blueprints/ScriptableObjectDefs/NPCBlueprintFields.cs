@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class NPCBlueprint : ScriptableObject {
+public abstract partial class NPCBlueprint : ScriptableObject {
 
     [SerializeField] protected int _totalHealth;
     public int TotalHealth { get { return _totalHealth; } }
@@ -12,17 +12,13 @@ public abstract class NPCBlueprint : ScriptableObject {
     public float RunSpeed { get { return _runSpeed; } }
 
     [SerializeField] private float _idleTimeMinimum;
-    public float IdleTimeMinimum { get { return _idleTimeMinimum; } }
     [SerializeField] private float _idleTimeMaximum;
-    public float IdleTimeMaximum { get { return _idleTimeMaximum; } }
+    public float GetNewIdleTime { get { return Random.Range(_idleTimeMinimum, _idleTimeMaximum); } }
 
-    public virtual void OnIdleEnter(NPCBehaviour npc) {
-
-    }
-    public virtual void OnIdleExecute(NPCBehaviour npc) {
-
-    }
-    public virtual void OnIdleExit(NPCBehaviour npc) {
-
-    }
+    [SerializeField] protected float _visionRange;
+    public float VisionRange { get { return _visionRange; } }
+    [SerializeField] protected float _visionAngle;
+    public float VisionAngle { get { return VisionAngle; } }
+    [SerializeField] protected LayerMask _visionMask;
+    public LayerMask VisionMask { get { return _visionMask; } }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -18,10 +19,21 @@ public abstract class CharacterBehaviour : MonoBehaviour, Damageable {
     public enum BusyState {
         NONE, ATTACK, SKILL
     }
+    [Flags] public enum Faction {
+        PLAYER = 1 << 0,
+        CIVILIAN = 1 << 1,
+        MONSTER = 1 << 2,
+        GUARD = 1 << 3, 
+        OUTLAW = 1 << 4,
+        CULTIST = 1 << 5
+    }
 
     [SerializeField] protected BusyState _currentBusyState;
     public BusyState CurrentBusyState { get { return _currentBusyState; } }
     protected Coroutine busyRoutine;
+
+    [SerializeField] protected Faction _faction;
+    public Faction GetFaction { get { return _faction; } }
 
     [SerializeField] protected int _attackComboIndex = 0;
     public int AttackComboIndex { get { return _attackComboIndex; } }

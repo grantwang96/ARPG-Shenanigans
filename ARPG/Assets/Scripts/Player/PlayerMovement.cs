@@ -72,11 +72,11 @@ public class PlayerMovement : CharacterMoveController { // this class handles th
     /// <returns></returns>
     private void ProcessPlayerInput() { // this produces the raw velocity of the player
         if (characterController.isGrounded) { movementVelocity = new Vector3(0f, movementVelocity.y, 0f); }
-        if(GameplayController.Instance.CurrentBusyState != CharacterBehaviour.BusyState.NONE) { return; }
+        if (GameplayController.Instance.CurrentBusyState != CharacterBehaviour.BusyState.NONE) { return; }
         Vector3 movementClamped =
             camCon.cameraAnchor.forward * characterBehaviour.walkVector.z + camCon.cameraAnchor.right * characterBehaviour.walkVector.x;
-        movementVelocity = new Vector3(movementClamped.x * baseSpeed, movementVelocity.y, movementClamped.z * baseSpeed);
         body.forward = Vector3.Lerp(body.forward, movementClamped.normalized, 0.5f);
+        movementVelocity = new Vector3(movementClamped.x * baseSpeed, movementVelocity.y, movementClamped.z * baseSpeed);
     }
 
     /// <summary>
@@ -92,7 +92,9 @@ public class PlayerMovement : CharacterMoveController { // this class handles th
     /// Event callback that makes the playerobject attack
     /// </summary>
     private void OnAttack() {
-
+        Vector3 movementClamped =
+            camCon.cameraAnchor.forward * characterBehaviour.walkVector.z + camCon.cameraAnchor.right * characterBehaviour.walkVector.x;
+        body.forward = Vector3.Lerp(body.forward, movementClamped.normalized, 0.5f);
     }
     
     /// <summary>
