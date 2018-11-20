@@ -13,6 +13,8 @@ public abstract class CharacterMoveController : MonoBehaviour { // Handles chara
     protected CharacterBehaviour characterBehaviour; // gain read access from character's brain
     protected CharacterController characterController; // accesses the character controller on the character
 
+    protected Vector3 movementVelocity;
+
     protected Coroutine busyAnimation; // coroutine that prevents other actions from being taken
 
     public virtual void Awake() {
@@ -25,6 +27,28 @@ public abstract class CharacterMoveController : MonoBehaviour { // Handles chara
     }
 
     public virtual void Update() {
-        
+
+    }
+
+    protected virtual void FixedUpdate() {
+        ProcessGravity();
+        characterController.Move(movementVelocity * Time.deltaTime);
+        movementVelocity.x = 0f;
+        movementVelocity.z = 0f;
+    }
+
+    protected virtual void ProcessGravity() {
+        if (movementVelocity.y > Physics.gravity.y) {
+            movementVelocity.y += Time.deltaTime * Physics.gravity.y;
+        }
+    }
+
+    // move the character at this speed in this direction
+    public virtual void Move(Vector3 moveDir, Vector3 facingDir, float speed) {
+        if (!performingAction) {
+            moveDir = moveDir.normalized;
+            movementVelocity.x = moveDir.x * speed;
+            movementVelocity.z = moveDir.z * speed;
+        }
     }
 }

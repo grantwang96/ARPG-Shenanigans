@@ -7,6 +7,7 @@ public abstract class BrainState {
     protected NPCBehaviour npcBehaviour;
 
     public virtual void Enter(NPCBehaviour behaviour) {
+        Debug.Log("Entering " + ToString());
         npcBehaviour = behaviour;
     }
     public virtual void Execute() {
@@ -56,6 +57,7 @@ public class IdleState : BrainState {
 public class MoveState : BrainState {
 
     float moveSpeed;
+    bool facingTarget;
 
     public MoveState(float speed) : base() {
         moveSpeed = speed;
@@ -63,15 +65,41 @@ public class MoveState : BrainState {
 
     public override void Enter(NPCBehaviour behaviour) {
         base.Enter(behaviour);
+        if (!npcBehaviour.CalculatePath(npcBehaviour.targetDestination)) {
+            npcBehaviour.ChangeBrainState(new IdleState(npcBehaviour.Blueprint.GetNewIdleTime));
+            return;
+        }
+        facingTarget = npcBehaviour.CurrentTarget != null;
+        Debug.Log("Starting position: " + npcBehaviour.transform.position);
+        for(int i = 0; i < npcBehaviour.Path.Length; i++) {
+            Debug.Log(npcBehaviour.Path[i]);
+        }
         npcBehaviour.Blueprint.OnMoveEnter(npcBehaviour);
     }
 
     public override void Execute() {
-        npcBehaviour.Blueprint.OnMoveExecute(npcBehaviour);
+        Vector3 lookDirection;
+        if (facingTarget) {
+            lookDirection = npcBehaviour.CurrentTarget.transform.position - npcBehaviour.transform.position;
+        } else {
+            lookDirection = npcBehaviour.currentDestination - npcBehaviour.transform.position;
+        }
+        CheckReachedPathCorner();
+
+        npcBehaviour.Blueprint.OnMoveExecute(npcBehaviour, moveSpeed, lookDirection);
     }
 
     public override void Exit() {
         npcBehaviour.Blueprint.OnMoveExit(npcBehaviour);
+    }
+
+    private void CheckReachedPathCorner() {
+        float distanceFromCurrentDestination = Vector3.Distance(npcBehaviour.transform.position, npcBehaviour.currentDestination);
+        if (distanceFromCurrentDestination < npcBehaviour.Agent.radius) {
+            if (!npcBehaviour.NextPathCorner()) {
+                npcBehaviour.ChangeBrainState(new IdleState(npcBehaviour.Blueprint.GetNewIdleTime));
+            }
+        }
     }
 }
 

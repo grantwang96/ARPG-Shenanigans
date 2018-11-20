@@ -17,7 +17,7 @@ public class DetectionRadius : MonoBehaviour {
         // if so, and it's not us, add to list of "known" characters
         if (otherCharBehaviour && otherCharBehaviour != myBehaviour) {
             Debug.Log(otherCharBehaviour.name + " has entered my sight radius");
-            myBehaviour.RegisterCharacterBehaviour(otherCharBehaviour);
+            myBehaviour.RegisterToKnownCharacters(otherCharBehaviour);
         }
     }
 
@@ -28,7 +28,7 @@ public class DetectionRadius : MonoBehaviour {
         // if so, and it's not us, remove from list of "known" characters
         if (otherCharBehaviour && otherCharBehaviour != myBehaviour) {
             Debug.Log(otherCharBehaviour.name + " has exited my sight radius");
-            myBehaviour.DeregisterCharacterBehaviour(otherCharBehaviour);
+            myBehaviour.DeregisterFromKnownCharacters(otherCharBehaviour);
         }
     }
 }

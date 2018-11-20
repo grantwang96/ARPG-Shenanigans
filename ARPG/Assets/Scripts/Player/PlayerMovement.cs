@@ -13,8 +13,7 @@ public class PlayerMovement : CharacterMoveController { // this class handles th
     [SerializeField] private Transform body;
     [SerializeField] private Transform rightHandRoot;
     [SerializeField] private Transform leftHandRoot;
-
-    [SerializeField] private Vector3 movementVelocity;
+    
     [SerializeField] private float jumpForce; // the initial velocity of the player when jumping
 
     [SerializeField] private float lastAttackTime = 0;
@@ -57,7 +56,7 @@ public class PlayerMovement : CharacterMoveController { // this class handles th
         GameplayController.Instance.JumpEvent -= OnJump;
     }
 
-    private void FixedUpdate() {
+    protected override void FixedUpdate() {
         // Calculate the player's movement velocity
         ProcessGravity();
         ProcessPlayerInput();
@@ -77,15 +76,6 @@ public class PlayerMovement : CharacterMoveController { // this class handles th
             camCon.cameraAnchor.forward * characterBehaviour.walkVector.z + camCon.cameraAnchor.right * characterBehaviour.walkVector.x;
         body.forward = Vector3.Lerp(body.forward, movementClamped.normalized, 0.5f);
         movementVelocity = new Vector3(movementClamped.x * baseSpeed, movementVelocity.y, movementClamped.z * baseSpeed);
-    }
-
-    /// <summary>
-    /// Calculates the character's vertical velocity
-    /// </summary>
-    private void ProcessGravity() {
-        if (movementVelocity.y > Physics.gravity.y) {
-            movementVelocity.y += Time.deltaTime * Physics.gravity.y;
-        }
     }
 
     /// <summary>
