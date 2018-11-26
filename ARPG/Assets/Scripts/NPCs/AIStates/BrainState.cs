@@ -71,10 +71,10 @@ public class MoveState : BrainState {
             npcBehaviour.ChangeBrainState(new IdleState(npcBehaviour.Blueprint.GetNewIdleTime));
             return;
         }
-        facingTarget = npcBehaviour.CurrentTarget != null;
     }
 
     public override void Execute() {
+        facingTarget = npcBehaviour.CurrentTarget != null;
         Vector3 lookDirection = npcBehaviour.transform.forward;
         if (facingTarget) {
             lookDirection = npcBehaviour.CurrentTarget.transform.position - npcBehaviour.transform.position;

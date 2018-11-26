@@ -149,10 +149,13 @@ public class NPCBehaviour : CharacterBehaviour, IVision {
     public virtual bool CanSeeTarget(Transform target) {
         float distance = Vector3.Distance(target.position, Head.position);
         Vector3 targetDir = target.position - Head.position;
-        float angle = Vector3.Angle(targetDir, Head.forward);
+        Vector3 targetDirZero = targetDir;
+        targetDirZero.y = 0f;
+        Vector3 headForward = Head.forward;
+        headForward.y = 0f;
+        float angle = Vector3.Angle(targetDirZero, headForward);
         if (distance < Blueprint.VisionRange && angle < Blueprint.VisionAngle) {
             RaycastHit hit;
-            Debug.DrawRay(Head.position, targetDir, Color.yellow, 10f);
             if(Physics.Raycast(Head.position, targetDir, out hit, distance, Blueprint.VisionMask)) {
                 if(hit.transform == target.root) { Debug.Log("See target!"); return true; }
             }

@@ -416,26 +416,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 114436906774451570, guid: cedaf214f2ca12f4193d7284ad08ee88,
-        type: 2}
-      propertyPath: _faction
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 136986290904775454, guid: cedaf214f2ca12f4193d7284ad08ee88,
-        type: 2}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114436906774451570, guid: cedaf214f2ca12f4193d7284ad08ee88,
-        type: 2}
-      propertyPath: _bodyTransform
-      value: 
-      objectReference: {fileID: 1849706533}
-    - target: {fileID: 114436906774451570, guid: cedaf214f2ca12f4193d7284ad08ee88,
-        type: 2}
-      propertyPath: _head
-      value: 
-      objectReference: {fileID: 1244980442}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cedaf214f2ca12f4193d7284ad08ee88, type: 2}
   m_IsPrefabAsset: 0
@@ -600,11 +580,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &1244980442 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4265763785164228, guid: cedaf214f2ca12f4193d7284ad08ee88,
-    type: 2}
-  m_PrefabInternal: {fileID: 499647159}
 --- !u!1 &1312932424
 GameObject:
   m_ObjectHideFlags: 0
@@ -801,6 +776,16 @@ Prefab:
       propertyPath: m_RootOrder
       value: 11
       objectReference: {fileID: 0}
+    - target: {fileID: 143654921473107268, guid: d26e2969d9c0b154a9700b49e456de41,
+        type: 2}
+      propertyPath: m_Height
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 143654921473107268, guid: d26e2969d9c0b154a9700b49e456de41,
+        type: 2}
+      propertyPath: m_Center.y
+      value: 1.25
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d26e2969d9c0b154a9700b49e456de41, type: 2}
   m_IsPrefabAsset: 0
@@ -891,11 +876,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &1849706533 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4242004647167322, guid: cedaf214f2ca12f4193d7284ad08ee88,
-    type: 2}
-  m_PrefabInternal: {fileID: 499647159}
 --- !u!1001 &2025408447
 Prefab:
   m_ObjectHideFlags: 0

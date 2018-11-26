@@ -17,8 +17,7 @@ MonoBehaviour:
   _idleTimeMinimum: 5
   _idleTimeMaximum: 6
   _visionRange: 20
-  _visionAngle: 45
+  _visionAngle: 80
   _visionMask:
     serializedVersion: 2
     m_Bits: 256
-  threatFactions: 1
