@@ -40,6 +40,12 @@ public abstract class CharacterBehaviour : MonoBehaviour, Damageable {
     [SerializeField] protected Skill[] attackCombo;
     public Skill[] AttackCombo { get { return attackCombo; } }
 
+    [SerializeField] protected Transform _bodyTransform;
+    public Transform BodyTransform { get { return _bodyTransform; } }
+    // where vision is calculated
+    [SerializeField] protected Transform _head;
+    public Transform Head { get { return _head; } }
+
     protected CharacterAnimationHandler animHandler;
     protected CharacterStats _stats;
     public CharacterStats stats { get { return _stats; } }

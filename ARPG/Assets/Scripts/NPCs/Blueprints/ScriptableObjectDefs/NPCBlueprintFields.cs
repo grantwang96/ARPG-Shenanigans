@@ -18,7 +18,7 @@ public abstract partial class NPCBlueprint : ScriptableObject {
     [SerializeField] protected float _visionRange;
     public float VisionRange { get { return _visionRange; } }
     [SerializeField] protected float _visionAngle;
-    public float VisionAngle { get { return VisionAngle; } }
+    public float VisionAngle { get { return _visionAngle; } }
     [SerializeField] protected LayerMask _visionMask;
     public LayerMask VisionMask { get { return _visionMask; } }
 }

@@ -29,6 +29,23 @@ public abstract partial class NPCBlueprint : ScriptableObject {
 
     }
 
+    public virtual void OnChaseEnter(NPCBehaviour npc) {
+
+    }
+    public virtual void OnChaseExecute(NPCBehaviour npc, Vector3 target) {
+        npc.CheckVision();
+        Vector3 dir = npc.CurrentTarget.transform.position - npc.transform.position;
+        dir.y = 0;
+        npc.CharMove.Move(dir, target, RunSpeed);
+
+        if(Vector3.Distance(npc.transform.position, target) < 2f) {
+            Debug.Log("Reached target!");
+        }
+    }
+    public virtual void OnChaseExit(NPCBehaviour npc) {
+
+    }
+
     public virtual void OnAttackEnter(NPCBehaviour npc) {
 
     }

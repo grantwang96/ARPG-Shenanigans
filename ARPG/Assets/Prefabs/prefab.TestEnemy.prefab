@@ -56,6 +56,7 @@ GameObject:
   - component: {fileID: 143654921473107268}
   - component: {fileID: 114417014402538356}
   - component: {fileID: 195412606874162842}
+  - component: {fileID: 114699873753707996}
   m_Layer: 8
   m_Name: prefab.TestEnemy
   m_TagString: Untagged
@@ -421,11 +422,28 @@ MonoBehaviour:
   _faction: 4
   _attackComboIndex: 0
   attackCombo: []
+  _head: {fileID: 4294932026804590}
   _health: 0
   Health: 0
+  _charMove: {fileID: 0}
   blueprint: {fileID: 11400000, guid: 6cf42e683caa2c24794d488d624d3a8c, type: 2}
-  _head: {fileID: 4294932026804590}
   _agent: {fileID: 0}
+  pathIndex: 0
+  targetDestination: {x: 0, y: 0, z: 0}
+  marker: {fileID: 0}
+--- !u!114 &114699873753707996
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1139801428471832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58ae692769b838043a956820f3f8e9c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseSpeed: 2.5
+  _performingAction: 0
 --- !u!135 &135595408443626768
 SphereCollider:
   m_ObjectHideFlags: 1

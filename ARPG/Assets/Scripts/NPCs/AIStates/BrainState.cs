@@ -7,7 +7,7 @@ public abstract class BrainState {
     protected NPCBehaviour npcBehaviour;
 
     public virtual void Enter(NPCBehaviour behaviour) {
-        Debug.Log("Entering " + ToString());
+        Debug.Log(behaviour.name + " has entered " + ToString());
         npcBehaviour = behaviour;
     }
     public virtual void Execute() {
@@ -33,7 +33,7 @@ public class IdleState : BrainState {
     public IdleState(float length) : base() {
         idleTime = length;
     }
-
+    
     public override void Enter(NPCBehaviour behaviour) {
         base.Enter(behaviour);
         idleStartTime = Time.time;
@@ -43,6 +43,7 @@ public class IdleState : BrainState {
     public override void Execute() {
         // idle time is over, change to walk mode
         if(Time.time - idleStartTime > idleTime) {
+            npcBehaviour.targetDestination = npcBehaviour.GetNextDestination();
             npcBehaviour.ChangeBrainState(new MoveState(npcBehaviour.Blueprint.WalkSpeed));
         }
         // perform normal idle behavior
@@ -65,27 +66,32 @@ public class MoveState : BrainState {
 
     public override void Enter(NPCBehaviour behaviour) {
         base.Enter(behaviour);
+        npcBehaviour.Blueprint.OnMoveEnter(npcBehaviour);
         if (!npcBehaviour.CalculatePath(npcBehaviour.targetDestination)) {
             npcBehaviour.ChangeBrainState(new IdleState(npcBehaviour.Blueprint.GetNewIdleTime));
             return;
         }
         facingTarget = npcBehaviour.CurrentTarget != null;
-        Debug.Log("Starting position: " + npcBehaviour.transform.position);
-        for(int i = 0; i < npcBehaviour.Path.Length; i++) {
-            Debug.Log(npcBehaviour.Path[i]);
-        }
-        npcBehaviour.Blueprint.OnMoveEnter(npcBehaviour);
     }
 
     public override void Execute() {
-        Vector3 lookDirection;
+        Vector3 lookDirection = npcBehaviour.transform.forward;
         if (facingTarget) {
             lookDirection = npcBehaviour.CurrentTarget.transform.position - npcBehaviour.transform.position;
-        } else {
+        }
+
+        if (npcBehaviour.Agent.pathPending) { Debug.Log(npcBehaviour.name + " path is pending..."); return; }
+
+        if (!npcBehaviour.Agent.hasPath) {
+            Debug.LogWarning(npcBehaviour.name + " agent has no path!");
+            npcBehaviour.ChangeBrainState(new IdleState(npcBehaviour.Blueprint.GetNewIdleTime));
+            return;
+        }
+        if (!facingTarget) {
             lookDirection = npcBehaviour.currentDestination - npcBehaviour.transform.position;
         }
-        CheckReachedPathCorner();
 
+        CheckReachedPathCorner();
         npcBehaviour.Blueprint.OnMoveExecute(npcBehaviour, moveSpeed, lookDirection);
     }
 
@@ -100,6 +106,32 @@ public class MoveState : BrainState {
                 npcBehaviour.ChangeBrainState(new IdleState(npcBehaviour.Blueprint.GetNewIdleTime));
             }
         }
+    }
+}
+
+// movement specifically during combat
+public class ChaseState : BrainState {
+
+    Vector3 targetLastKnownPosition;
+
+    public override void Enter(NPCBehaviour behaviour) {
+        base.Enter(behaviour);
+        if(npcBehaviour.CurrentTarget == null) { npcBehaviour.ChangeBrainState(new IdleState(npcBehaviour.Blueprint.GetNewIdleTime)); }
+    }
+
+    public override void Execute() {
+        if (!npcBehaviour.CanSeeTarget(npcBehaviour.CurrentTarget.BodyTransform)) {
+            Debug.Log("lost sight of target");
+            npcBehaviour.ChangeBrainState(new MoveState(npcBehaviour.Blueprint.RunSpeed));
+            return;
+        }
+        targetLastKnownPosition = npcBehaviour.CurrentTarget.transform.position;
+
+        npcBehaviour.Blueprint.OnChaseExecute(npcBehaviour, targetLastKnownPosition);
+    }
+
+    public override void Exit() {
+        base.Exit();
     }
 }
 

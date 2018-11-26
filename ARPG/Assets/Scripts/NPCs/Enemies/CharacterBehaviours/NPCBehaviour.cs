@@ -14,16 +14,12 @@ public class NPCBehaviour : CharacterBehaviour, IVision {
     public NPCBlueprint Blueprint { get { return blueprint; } }
     protected BrainState currentBrainState; // current state of AI State Machine
 
-    // where vision is calculated
-    [SerializeField] protected Transform _head;
-    public Transform Head { get { return _head; } }
-
     // where pathfinding is handled (do not allow agent to move character)
     [SerializeField] protected NavMeshAgent _agent;
     public NavMeshAgent Agent { get { return _agent; } }
 
     // characters this NPC is aware of
-    protected List<CharacterBehaviour> knownCharacters = new List<CharacterBehaviour>();
+    [SerializeField] protected List<CharacterBehaviour> knownCharacters = new List<CharacterBehaviour>();
     public List<CharacterBehaviour> KnownCharacters { get { return knownCharacters; } }
     // if the NPC is tracking another Character, this is the target they are tracking
     protected CharacterBehaviour currentTarget;
@@ -34,6 +30,10 @@ public class NPCBehaviour : CharacterBehaviour, IVision {
     public Vector3[] Path { get { return _path.corners; } }
     public Vector3 currentDestination {
         get {
+            if(_path == null || _path.corners.Length == 0) {
+                Debug.LogWarning(name + ": currentDestination called, but path is empty!");
+                return transform.position + transform.forward;
+            }
             return _path.corners[pathIndex];
         }
 
@@ -46,7 +46,6 @@ public class NPCBehaviour : CharacterBehaviour, IVision {
 
     // HACK: REMOVE/MODIFY LATER
     public Vector3 targetDestination;
-    public GameObject marker;
 
     protected override void Awake() {
         base.Awake();
@@ -66,7 +65,6 @@ public class NPCBehaviour : CharacterBehaviour, IVision {
 
     protected virtual void Update() {
         if(currentBrainState != null) { currentBrainState.Execute(); }
-        if (Input.GetKeyDown(KeyCode.K)) { IsThreat(GameplayController.Instance); }
     }
 
     /// <summary>
@@ -97,23 +95,52 @@ public class NPCBehaviour : CharacterBehaviour, IVision {
     }
     
     public virtual bool CalculatePath(Vector3 destination) {
+        if (_agent.pathPending) { StopCoroutine(PathPending()); }
         _path = new NavMeshPath();
         pathIndex = 0;
-        return NavMesh.CalculatePath(transform.position, destination, NavMesh.AllAreas, _path);
+        Agent.nextPosition = transform.position;
+        bool success = Agent.SetDestination(destination);
+        StartCoroutine(PathPending());
+        return success;
     }
 
-    public virtual bool CheckPathSegment(int start, int end) {
+    private IEnumerator PathPending() {
+        while (_agent.pathPending) { yield return null; }
+        Agent.isStopped = true;
+        _path = _agent.path;
+    }
+
+    public virtual bool CheckPathSegment(Vector3 start, Vector3 end) {
         NavMeshHit hit;
-        if ( NavMesh.Raycast(Path[start], Path[end], out hit, NavMesh.AllAreas)) {
+        if (NavMesh.Raycast(start, end, out hit, NavMesh.AllAreas)) {
             return false;
         }
         return true;
     }
 
+    public virtual Vector3 GetNextDestination() {
+
+        Vector3 randomLocation = transform.position + Random.onUnitSphere * 10f;
+        randomLocation.y = transform.position.y;
+
+        NavMeshHit hit;
+        if(NavMesh.SamplePosition(randomLocation, out hit, 10f, NavMesh.AllAreas)) {
+            return hit.position;
+        }
+        return transform.position;
+    }
+
     public virtual void CheckVision() {
         // TODO: IMPLEMENT THIS FUNCTION
+
+        if(CurrentTarget != null) {
+            if (CanSeeTarget(CurrentTarget.BodyTransform)) { ReactToCharacter(CurrentTarget); }
+            else { currentTarget = null; }
+            return;
+        }
+
         foreach(CharacterBehaviour character in knownCharacters) {
-            if (CanSeeTarget(character.transform)) {
+            if (CanSeeTarget(character.BodyTransform)) {
                 ReactToCharacter(character);
             }
         }
@@ -125,10 +152,12 @@ public class NPCBehaviour : CharacterBehaviour, IVision {
         float angle = Vector3.Angle(targetDir, Head.forward);
         if (distance < Blueprint.VisionRange && angle < Blueprint.VisionAngle) {
             RaycastHit hit;
+            Debug.DrawRay(Head.position, targetDir, Color.yellow, 10f);
             if(Physics.Raycast(Head.position, targetDir, out hit, distance, Blueprint.VisionMask)) {
-                if(hit.transform == target) { return true; }
+                if(hit.transform == target.root) { Debug.Log("See target!"); return true; }
             }
         }
+        Debug.Log("Don't see target!");
         return false;
     }
     
